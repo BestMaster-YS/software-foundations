@@ -154,18 +154,139 @@ Definition testA: Test.testType := Test.noTest.
 
 (* Tuple *)
 
+Inductive bit : Type :=
+| B0
+| B1.
+
+Inductive nybble: Type :=
+| bits (b0 b1 b2 b3 : bit).
+
+Check (bits B1 B0 B1 B0) : nybble.
+
+Definition all_zero (ny1: nybble) : bool :=
+  match ny1 with
+  | (bits B0 B0 B0 B0) => true
+  | (bits _ _ _ _) => false
+  end.
 
 
+Compute (all_zero (bits B1 B0 B0 B1)).
+
+(* Natrual Numbers *)
+
+Module NatPlayround.
+
+  Inductive nat : Type :=
+  | O : nat
+  | S (n : nat) : nat.
+
+  Definition pred (n: nat) :=
+    match n with
+    | O => O
+    | S n' => n'
+    end.
+
+End NatPlayround.
+
+Check (S (S (S (S O)))).
+
+Definition minusTwo (n: nat) :=
+  match n with
+  | O => O
+  | S O => O
+  | S (S n') => n'
+  end.
+
+Compute (minusTwo 5).
+
+Check S.
+Check pred.
+Check minusTwo.
 
 
+Fixpoint evenb (n:nat) : bool :=
+  match n with
+  | O => true
+  | S O => false
+  | S (S n') => evenb n'
+  end.
+
+Compute (evenb 5).
+
+Definition oddn (n:nat) :bool :=
+  negb (evenb n).
+
+Compute (oddn 5).
+
+Module NatPlayround2.
+
+  Fixpoint plus (n: nat) (m: nat) : nat :=
+    match n with
+    | O => m
+    | S n' => S (plus n' m)
+    end.
+
+  Compute (plus 3 5).
+
+  Fixpoint mult (n m: nat) : nat :=
+    match n with
+    | O => O
+    | S O => m
+    | S (S n') => plus (plus m m) (mult n' m)
+    end.
+
+  Example test_mult_3_3_equal_9: (mult 3 3) = 9.
+  Proof. simpl. reflexivity. Qed.
+
+  Fixpoint minus (n m : nat) : nat :=
+    match n, m with
+    | O, _ => O
+    | S _, O => n
+    | S n', S m' => minus n' m'
+    end.
+
+  Example test_minus1: (minus 3 2) = 1.
+  Proof. simpl. reflexivity. Qed.
+
+End NatPlayround2.
+
+Fixpoint exp (base power: nat) : nat :=
+  match power with
+  | O => S O
+  | S power' => mult base (exp base power')
+  end.
 
 
+Compute (exp 2 3).
+
+(* Exercise factorial *)
+Fixpoint factorial (n: nat) : nat :=
+  match n with
+  | O => S O
+  | S n' => mult n (factorial n')
+  end.
+
+Example test_factorial1: (factorial 3) = 6.
+Proof. simpl. reflexivity. Qed.
 
 
+Example test_factorial2: (factorial 5) = (mult 10 12).
+Proof. simpl. reflexivity. Qed.
 
+Notation "x + y" := (plus x y)
+                      (at level 50, left associativity)
+                    : nat_scope.
 
+Notation "x - y" := (minus x y)
+                      (at level 50, left associativity)
+                    : nat_scope.
 
+Notation "x * y" := (mult x y)
+                      (at level 40, left associativity)
+                    : nat_scope.
 
+Check ((0 + 1) + 1) : nat.
 
+Compute ((0 + 1) + 1).
 
 
