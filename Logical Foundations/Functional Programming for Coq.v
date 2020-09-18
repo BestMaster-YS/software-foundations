@@ -289,4 +289,158 @@ Check ((0 + 1) + 1) : nat.
 
 Compute ((0 + 1) + 1).
 
+(* equal number  *)
+
+Fixpoint eqb (n m: nat) : bool :=
+  match n with
+  | O => match m with
+         | O => true
+         | S m' => false
+         end
+  | S n' => match m with
+            | O => false
+            | S m' => eqb n' m'
+            end
+  end.
+
+Fixpoint leb (n m : nat) : bool :=
+  match n with
+  | O => true
+  | S n' =>
+    match m with
+    | O => false
+    | S m' => leb n' m'
+    end
+  end.
+
+Example test_leb1: leb 2 2 = true.
+Proof. simpl. reflexivity. Qed.
+
+Example test_leb2: leb 1 2 = true .
+Proof. simpl. reflexivity. Qed.
+
+Example test_eqb1: eqb 1 2 = false.
+Proof. simpl. reflexivity. Qed.
+
+Example test_eqb2: eqb 2 2 = true.
+Proof. simpl. reflexivity. Qed.
+
+
+Notation "x =? y" := (eqb x y) (at level 70) : nat_scope.
+Notation "x <=? y" := (leb x y) (at level 70) : nat_scope.
+
+Example test_leb3: (4 <=? 2) = false.
+Proof. simpl. reflexivity. Qed.
+
+
+(* exercise *)
+Fixpoint ltb (n m: nat) : bool :=
+  match n,m with
+  | O, O => false
+  | O, S m' => true
+  | S n',O => false
+  | S n', S m' => ltb n' m'
+  end.
+
+Notation "x <? y" := (ltb x y) (at level 70) : nat_scope.
+
+Example test_ltb1: (ltb 2 2) = false.
+Proof. simpl. reflexivity. Qed.
+
+Example test_ltb2: (ltb 2 3) = true.
+Proof. simpl. reflexivity. Qed.
+
+(* Proof by simplification *)
+
+
+Theorem plus_0_n : forall n: nat, 0 + n = n.
+Proof.
+  intros n. simpl. reflexivity. Qed.
+
+Theorem plus_1_1 : forall n: nat, 1 + n = S n.
+Proof.
+  intros n. simpl. reflexivity. Qed.
+
+Theorem mult_0_1 : forall n: nat, 0 * n = 0.
+Proof.
+  intros n. simpl. reflexivity. Qed.
+
+(* Proof by rewriting *)
+
+Theorem plus_id: forall n m : nat,
+    n = m ->
+    n + n = m + m.
+Proof.
+  intros n m.
+  intros H.
+  rewrite -> H.
+  reflexivity. Qed.
+
+(* plus_id exercise  *)
+
+Theorem plus_id_exercise: forall n m o : nat,
+    n = m -> m = o -> n + m = m + o.
+Proof.
+  intros n m o.
+  intros H1.
+  intros H2.
+  rewrite -> H1.
+  rewrite <- H2.
+  reflexivity. Qed.
+
+
+(*
+Check mult_0_1.
+乘法定义中 0 * n = 0，不能直接得到 n * 0 = 0.
+*)
+Theorem mult_n_0_m_0 : forall p q : nat,
+    (0 * p) + (0 * q) = 0.
+Proof.
+  intros q p.
+  rewrite -> (mult_0_1 q).
+  rewrite -> (mult_0_1 p).
+  reflexivity. Qed.
+
+
+Check mult.
+
+(* exercise 先将下列两个lemma作为已知条件 *)
+
+Lemma mult_n_0: forall n: nat,
+    0 = n * 0.
+Proof. Admitted.
+
+Lemma mult_n_Sm: forall n m : nat,
+    n * m + n = n * S m.
+Proof. Admitted.
+
+
+Theorem mult_n_1: forall n : nat,
+    n * 1 = n.
+Proof.
+  intros.
+  rewrite <- (mult_n_Sm n 0).
+  (* n * 0 + n = n * 1 *)
+  (* n * 0 + n = n  *)
+  rewrite <- (mult_n_0 n).
+  reflexivity.
+Qed.
+
+(* Proof by case analysis *)
+
+Theorem plus_1_equal_0_firsttry : forall n : nat,
+    (n + 1) =? 0 = false.
+Proof.
+  intros.
+  simpl.
+Qed.
+
+
+
+
+
+
+
+
+
 
