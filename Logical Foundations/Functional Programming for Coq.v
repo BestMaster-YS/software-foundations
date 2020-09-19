@@ -367,6 +367,7 @@ Proof.
 
 (* Proof by rewriting *)
 
+
 Theorem plus_id: forall n m : nat,
     n = m ->
     n + n = m + m.
@@ -418,7 +419,7 @@ Proof. Admitted.
 Theorem mult_n_1: forall n : nat,
     n * 1 = n.
 Proof.
-  intros.
+  intros n.
   rewrite <- (mult_n_Sm n 0).
   (* n * 0 + n = n * 1 *)
   (* n * 0 + n = n  *)
@@ -431,12 +432,21 @@ Qed.
 Theorem plus_1_equal_0_firsttry : forall n : nat,
     (n + 1) =? 0 = false.
 Proof.
-  intros.
-  simpl.
+  intros n.
+  destruct n as [| n'].
+  - reflexivity.
+  - reflexivity.
 Qed.
 
 
-
+Theorem negb_involutive : forall b : bool,
+    negb (negb b) = b.
+Proof.
+  intros b.
+  destruct b eqn:E.
+  - reflexivity.
+  - reflexivity.
+Qed.
 
 
 
