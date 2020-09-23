@@ -433,7 +433,7 @@ Theorem plus_1_equal_0_firsttry : forall n : nat,
     (n + 1) =? 0 = false.
 Proof.
   intros n.
-  destruct n as [| n'].
+  destruct n as [| n'] eqn:E.
   - reflexivity.
   - reflexivity.
 Qed.
@@ -448,7 +448,64 @@ Proof.
   - reflexivity.
 Qed.
 
+Theorem andb_commutative : forall a b, andb a b = andb b a.
+Proof.
+  intros c b. destruct b eqn:Eb.
+  {
+    destruct c eqn:Ec.
+    { reflexivity. }
+    { reflexivity. }
+  }
+  {
+    destruct c eqn:Ec.
+    { reflexivity. }
+    { reflexivity. }
+  }
+Qed.
 
+
+(* Exercise *)
+
+Theorem andb_true_clim2: forall b c : bool,
+    andb b c = true -> c = true.
+Proof.
+  intros b c. destruct b eqn:Eb.
+  (* b = true *)
+  - destruct c eqn:Ec.
+    (* c = true *)
+    + reflexivity.
+    (* c = false *)
+    + intros H.
+      rewrite <- H.
+      reflexivity.
+  (* b = false *)
+  - destruct c eqn:Ec.
+    (* c = true *)
+    + reflexivity.
+    (* c = false *)
+    + intros H.
+      rewrite <- H.
+      reflexivity.
+Qed.
+
+
+
+Theorem zero_nbeq_plus_1 : forall n : nat,
+    0 =? (n + 1) = false.
+Proof.
+  intros [|n'].
+  - reflexivity.
+  - reflexivity.
+Qed.
+
+Fixpoint plus' (n: nat) (m: nat) : nat :=
+  match n with
+  | O => m
+  | S n' => S (plus' n' m)
+  end.
+
+
+(* 练习 2**  *)
 
 
 

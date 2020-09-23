@@ -158,9 +158,94 @@ Proof.
   - reflexivity. Qed.
 ```
 
-**destruct** 可以对归纳类型进行分解，因为 nat 含有两个构造子，则分成两个子目标分开证明，"as [| n']" 为 intro pattern. 显示子目标构造子参数变量名称，由 | 进行分隔。由于 O构造子没有参数，则不显示。在每个子目标中 Coq 会记住此目标中 n 为 O 或者 S n'。"eqn:E" The eqn:E annotation tells destruct to give the name E to this equation. Leaving off the eqn:E annotation causes Coq to elide these assumptions in the subgoals. 没太看懂意思。
+**destruct** 可以对归纳类型进行分解，因为 nat 含有两个构造子，则分成两个子目标分开证明，"as [| n']" 为 intro pattern. 显示子目标构造子参数变量名称，由 | 进行分隔。由于 O构造子没有参数，则不显示。在每个子目标中 Coq 会记住此目标中 n 为 O 或者 S n'。"eqn:E" The eqn:E annotation tells destruct to give the name E to this equation. Leaving off the eqn:E annotation causes Coq to elide these assumptions in the subgoals. 
+
+```Coq
+Theorem negb_involution : forall b : bool,
+	negb (negb) = b.
+Proof.
+	intros b.
+	destruct b eqn:E.
+	- reflexivity.
+	- reflexivity.
+Qed.
+
+(*
+当coq运行至 destruct b eqn:E. 时
+  b : bool
+  E : b = true
+  ============================
+  negb (negb true) = true
+*)
+```
+
+在证明 negb_involution 中，E 代表等式 b = true.
+
+```Coq
+
+Theorem andb_commutative : ∀ b c, andb b c = andb c b.
+Proof.
+  intros b c. destruct b eqn:Eb.
+  - destruct c eqn:Ec.
+    + reflexivity.
+    + reflexivity.
+  - destruct c eqn:Ec.
+    + reflexivity.
+    + reflexivity.
+Qed.
+```
+
+\- 和 \+ 表示对改命题分情况讨论，并且可以无限的进行细分。也可以采用不用的符号。
+
+### 练习
+
+```
+(* 不知道是不是正确答案，但是能通过coq证明 *)
+Theorem andb_true_clim2: forall b c : bool,
+    andb b c = true -> c = true.
+Proof.
+  intros b c. destruct b eqn:Eb.
+  (* b = true *)
+  - destruct c eqn:Ec.
+    (* c = true *)
+    + reflexivity.
+    (* c = false *)
+    + intros H.
+      rewrite <- H.
+      reflexivity.
+  (* b = false *)
+  - destruct c eqn:Ec.
+    (* c = true *)
+    + reflexivity.
+    (* c = false *)
+    + intros H.
+      rewrite <- H.
+      reflexivity.
+Qed.
+```
 
 
 
+```Coq
+intros b c. destruct b as [|b'] eqn:E.
 
+(* 简化为 *)
+
+intros [|b'] [].
+```
+
+
+
+```
+Notation "x + y" := (plus x y)
+                       (at level 50, left associativity)
+                       : nat_scope.
+Notation "x * y" := (mult x y)
+                       (at level 40, left associativity)
+                       : nat_scope.
+```
+
+
+
+at level 40  代表优先级，left associativity 代表左结合。
 
