@@ -507,6 +507,39 @@ Fixpoint plus' (n: nat) (m: nat) : nat :=
 
 (* 练习 2**  *)
 
+(*
+Definition plus_without_fixpoint (n: nat) (m: nat) :nat :=
+  match n with
+  | O => m
+  | S n' => S (plus_without_fixpoint n' m)
+  end.
+
+Error: The reference plus_without_fixpoint was not found
+in the current environment.
+
+*)
+
+(* more exercise *)
+
+Theorem identity_fn_applied_twice : forall (f: bool -> bool),
+    (forall (a : bool), f a = a) ->
+    forall (b: bool), f (f b) = b.
+Proof.
+  intros f. intros H.
+  intros [].
+  - rewrite -> H.
+    rewrite -> H.
+    reflexivity.
+  - rewrite -> H.
+    rewrite -> H.
+    reflexivity.
+Qed.
+
+
+
+
+
+
 
 
 
