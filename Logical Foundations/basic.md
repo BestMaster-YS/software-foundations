@@ -224,8 +224,6 @@ Proof.
 Qed.
 ```
 
-
-
 ```Coq
 intros b c. destruct b as [|b'] eqn:E.
 
@@ -233,8 +231,6 @@ intros b c. destruct b as [|b'] eqn:E.
 
 intros [|b'] [].
 ```
-
-
 
 ```
 Notation "x + y" := (plus x y)
@@ -244,8 +240,6 @@ Notation "x * y" := (mult x y)
                        (at level 40, left associativity)
                        : nat_scope.
 ```
-
-
 
 at level 40  代表优先级，left associativity 代表左结合。
 
