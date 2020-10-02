@@ -535,12 +535,121 @@ Proof.
     reflexivity.
 Qed.
 
+Theorem negation_fn_applied_twice : forall (f: bool -> bool),
+    (forall (a: bool), f a = negb a) ->
+    forall (b: bool), f (f b) = b.
+Proof.
+  intros f. intros H.
+  intros [].
+  - rewrite -> H.
+    rewrite -> H.
+    reflexivity.
+  - rewrite -> H.
+    rewrite -> H.
+    reflexivity.
+Qed.
+
+(* 先证明四个引理 *)
+
+Lemma and_true_eq_another: forall b: bool,
+    andb true b = b.
+Proof.
+  intros [].
+  - reflexivity.
+  - reflexivity.
+Qed.
+
+Lemma or_false_eq_another: forall b: bool,
+    orb false b = b.
+Proof.
+  intros [].
+  - reflexivity.
+  - reflexivity.
+Qed.
+
+Theorem andb_eq_orb : forall (b c: bool),
+    (andb b c = orb b c) ->
+    b = c.
+Proof.
+  intros b c.
+  destruct b eqn:Eb.
+  - rewrite -> (and_true_eq_another c).
+    intros H.
+    rewrite -> H.
+    reflexivity.
+  - rewrite -> (or_false_eq_another c).
+    (* false && c = c -> false = c *)
+    intros H.
+    (*
+      H: false && c = c
+      false = c
+    *)
+    rewrite <- H.
+    reflexivity.
+Qed.
+
+Inductive bin : Type :=
+| Z
+| Bin0 (n: bin)
+| Bin1 (n: bin).
+
+Fixpoint incr (m: bin) : bin :=
+  match m with
+  | Z => Bin1 Z
+  | Bin0 m' => Bin1 m'
+  (* 增加一位 Bin0, 自身的Bin1变为Bin0 *)
+  (* 分两种情况，Bin1 Z 不能把 Bin1 变为 Bin0 *)
+  | Bin1 Z => Bin0 (Bin1 Z)
+  | Bin1 m' => Bin0 (Bin0 m')
+  end.
 
 
+(* bin 转化为 nat *)
+
+Fixpoint bin_to_nat (m: bin) : nat :=
+  match m with
+  | Z => O
+  | Bin0 m' => NatPlayround2.mult (bin_to_nat m') 2
+  | Bin1 m' => S (NatPlayround2.mult (bin_to_nat m') 2)
+  end.
 
 
+Compute (bin_to_nat (Bin1 Z)).
 
+Compute (bin_to_nat (Bin0 (Bin1 Z))).
 
+Compute (bin_to_nat (Bin1 (Bin0 (Bin1 Z)))).
 
+Example test_bin_incr1: (incr (Bin1 Z)) = Bin0 (Bin1 Z).
+Proof.
+  simpl. reflexivity.
+Qed.
+
+Example test_bin_incr2 : (incr (Bin0 (Bin1 Z))) = Bin1 (Bin1 Z).
+Proof.
+  simpl. reflexivity.
+Qed.
+
+Example test_bin_incr3 : (incr (Bin1 (Bin1 Z))) = Bin0 (Bin0 (Bin1 Z)).
+Proof.
+  simpl. reflexivity.
+Qed.
+
+Example test_bin_incr4 : bin_to_nat (Bin0 (Bin1 Z)) = 2.
+Proof.
+  simpl. reflexivity.
+Qed.
+
+Example test_bin_incr5 :
+        bin_to_nat (incr (Bin1 Z)) = 1 + bin_to_nat (Bin1 Z).
+Proof.
+  simpl. reflexivity.
+Qed.
+
+Example test_bin_incr6 :
+        bin_to_nat (incr (incr (Bin1 Z))) = 2 + bin_to_nat (Bin1 Z).
+Proof.
+  simpl. reflexivity.
+Qed.
 
 
