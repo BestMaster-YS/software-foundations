@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+*/*.vos
+*/*.vio
+node_modules
+.vscode
+*/*.glob
+*/*.vok
+*/*.aux
+*/*.vo

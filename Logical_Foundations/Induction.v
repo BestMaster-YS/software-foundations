@@ -218,6 +218,75 @@ Proof.
 Admitted.
 
 
+(**)
+Inductive bin : Type :=
+| Z
+| Bin0 : bin -> bin (* B_0 n = 2*n  *)
+| Bin1 : bin -> bin. (* B_1 =  2*n + 1  *)
+
+Fixpoint incr (m: bin) : bin :=
+  match m with
+  | Z => Bin1 Z
+  | Bin0 m' => Bin1 m'
+  | Bin1 m' => Bin0 (incr m')
+  end.
+
+(* bin 转化为 nat *)
+
+Fixpoint bin_to_nat (m: bin) : nat :=
+  match m with
+  | Z => O
+  | Bin0 m' => 2 * (bin_to_nat m')
+  | Bin1 m' => 2 * (bin_to_nat m') + 1
+  end.
+
+Lemma plus_1_eq_S : forall n : nat,
+    n + 1 = S n.
+Proof.
+  intros n. induction n.
+  - simpl. reflexivity.
+  - simpl. rewrite <- IHn. reflexivity.
+Qed.
+
+Lemma plus_0_equal : forall n: nat,
+    n + 0 = n.
+Proof.
+  intros. induction n.
+  - reflexivity.
+  - simpl. rewrite -> IHn. reflexivity.
+Qed.
+
+Theorem bin_to_nat_pres_inrc : forall b : bin,
+    S (bin_to_nat b) = bin_to_nat (incr b).
+Proof.
+  intros b. induction b.
+  - simpl. reflexivity.
+  - simpl. rewrite <- plus_1_eq_S. reflexivity.
+  - simpl. rewrite <- IHb. rewrite -> plus_0_equal.
+    rewrite -> (plus_0_equal (S (bin_to_nat b))).
+    rewrite <- plus_1_eq_S.
+    rewrite <- (plus_1_eq_S (bin_to_nat b)).
+    rewrite -> (plus_assoc (bin_to_nat b) 1 (bin_to_nat b + 1)).
+    rewrite -> (plus_swap 1 (bin_to_nat b) 1).
+    rewrite <- (plus_assoc (bin_to_nat b) (bin_to_nat b) (1 + 1)).
+    rewrite -> plus_assoc. reflexivity.
+Qed.
 
 
+Fixpoint nat_to_bin (n: nat) : bin :=
+  match n with
+  | O => Z
+  | S n' => incr (nat_to_bin n')
+  end.
+
+Theorem nat_bin_nat : forall n: nat,
+    bin_to_nat (nat_to_bin n) = n.
+Proof.
+  intros n. induction n.
+  - reflexivity.
+  - simpl. rewrite <- (bin_to_nat_pres_inrc (nat_to_bin n)).
+    rewrite -> IHn. reflexivity.
+Qed.
+
+(* 不明白 normalize 函数的意思  *)
 
