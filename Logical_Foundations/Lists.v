@@ -346,13 +346,145 @@ Module NatList.
       rewrite <- H. rewrite <- IHl. reflexivity.
   Qed.
 
-  
+  Theorem count_member_nonzero : forall l:natList,
+      1 <=? (count 1 (1 :: l)) = true.
+  Proof.
+    intros l. destruct l.
+    - simpl. reflexivity.
+    - simpl. rewrite -> plus_1_eq_S. reflexivity.
+  Qed.
+
+  Theorem leb_n_Sn : forall n:nat,
+      n <=? (S n) = true.
+  Proof.
+    intros. induction n.
+    - reflexivity.
+    - simpl. rewrite -> IHn. reflexivity.
+  Qed.
+
+  Theorem remove_dose_not_increase_count : forall l:natList,
+      (count 0 (remove_one 0 l)) <=? (count 0 l) = true.
+  Proof.
+    intros. induction l.
+    - simpl. reflexivity.
+    - simpl. destruct n.
+      + simpl. rewrite -> plus_1_eq_S. rewrite -> leb_n_Sn. reflexivity.
+      + simpl. rewrite -> IHl. reflexivity.
+  Qed.
+
+  (*rev_list 是单射函数*)
+  Theorem rev_list_injective : forall (l1 l2 : natList),
+      rev_list l1 = rev_list l2 -> l1 = l2.
+  Proof.
+    (* 妙啊 *)
+    intros l1 l2 H. rewrite <- rev_involutive. rewrite <- H. rewrite -> rev_involutive. reflexivity.
+  Qed.
+
+  Inductive natOption : Type :=
+  | Some (n: nat)
+  | None.
+
+  Fixpoint nth_error (l: natList) (n: nat) :=
+    match l with
+    | nil => None
+    | a :: l' => match n with
+                 | O => Some a
+                 | S n' => nth_error l' n'
+                 end
+    end.
+
+  Compute (nth_error [1;2;3;4;5;6] 7).
+  Compute (nth_error [1;2;3;4;5;6] 5).
 
 
+  Definition option_elim (d: nat) (o: natOption) : nat :=
+    match o with
+    | Some n => n
+    | None => d
+    end.
+
+  Definition hd_error (l: natList) : natOption :=
+    match l with
+    | nil => None
+    | h::t => Some h
+    end.
 
 
+  Theorem option_elim_hd : forall (l: natList) (default: nat),
+      head default l = option_elim default (hd_error l).
+  Proof.
+    intros l default. destruct l.
+    - simpl. destruct default.
+      + reflexivity.
+      + reflexivity.
+    - simpl. destruct default.
+      + reflexivity.
+      + reflexivity.
+  Qed.
 
+  (* partial maps *)
+  Inductive id : Type :=
+  | Id (n : nat).
+
+
+  Definition eqb_id (x1 x2 : id) :=
+    match x1, x2 with
+    | Id n1, Id n2 => n1 =? n2
+    end.
+
+  Theorem eq_refl : forall n : nat,
+      true = (n =? n).
+  Proof.
+    induction n.
+    - reflexivity.
+    - simpl. rewrite -> IHn. reflexivity.
+  Qed.
+
+  Theorem eqb_id_refl : forall x : id, true = eqb_id x x.
+  Proof.
+    intros x. destruct x as [n]. simpl. rewrite <- eq_refl. reflexivity.
+  Qed.
 
 End NatList.
+
+Module PartialMap.
+
+  Export NatList.
+
+  Inductive partial_map : Type :=
+  | empty
+  | record (i: id) (v : nat) (m : partial_map).
+
+  Definition update (d: partial_map) (x: id) (value: nat) : partial_map :=
+    record x value d.
+
+  Fixpoint find (x: id) (d: partial_map) : natOption :=
+    match d with
+    | empty => None
+    | record y v d' => if eqb_id x y
+                       then Some v
+                       else find x d'
+    end.
+
+  Theorem update_eq : forall (d: partial_map) (x: id) (v: nat),
+      find x (update d x v) = Some v.
+  Proof.
+    intros. simpl. rewrite <- eqb_id_refl. reflexivity.
+  Qed.
+
+  Theorem update_neq: forall (d: partial_map) (x y: id) (o: nat),
+      eqb_id x y = false -> find x (update d y 0) = find x d.
+  Proof.
+    intros. simpl. rewrite -> H. reflexivity.
+  Qed.
+
+End PartialMap.
+
+Inductive baz: Type :=
+| Baz1 (x: baz)
+| Baz2 (y: baz) (b: bool).
+
+
+(* 两种，Baz1 和 Baz2 两个构造子 *)
 
 
